@@ -34,19 +34,16 @@ no_magisk_check=1
 # import functions/variables and setup patching - see for reference (DO NOT REMOVE)
 . tools/ak3-core.sh
 
-# GKI check
-kernel_version=$(cat /proc/version | awk -F '-' '{print $1}' | awk '{print $3}')
+# Match the GKI family built by ZenKernel. Android's userspace version may
+# differ from the Android branch of its kernel, so inspect the kernel release.
+kernel_version=$(awk '{print $3}' /proc/version)
 case $kernel_version in
-    5.10*) ksu_supported=true ;;
-    5.15*) ksu_supported=true ;;
-    6.1*) ksu_supported=true ;;
-    6.6*) ksu_supported=true ;;
-    6.12*) ksu_supported=true ;;
+    5.10.*-android12-*) ksu_supported=true ;;
     *) ksu_supported=false ;;
 esac
 
-ui_print " " "  -> ZenKernel GKI Supported: $ksu_supported"
-$ksu_supported || abort "  -> Non-GKI device, abort."
+ui_print " " "  -> Current kernel: $kernel_version"
+$ksu_supported || abort "  -> This package requires Android 12 GKI 5.10."
 
 # boot install
 split_boot
